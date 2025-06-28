@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrueEye - Sistema Inteligente de Alfabetización Mediática</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'trueeye-dark': '#2b0126',
+                        'trueeye-gold': '#f6ae2d',
+                        'trueeye-navbar': '#2b0126',  // Ahora es el mismo que trueeye-dark
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos para modo oscuro */
+        .dark .markdown-content a {
+            color: #f6ae2d;
+            text-decoration: underline;
+        }
+        .dark .markdown-content h1, 
+        .dark .markdown-content h2, 
+        .dark .markdown-content h3, 
+        .dark .markdown-content h4 {
+            color: #f6ae2d;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        /* Estilos para modo claro */
+        .markdown-content a {
+            color: #420909;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        .markdown-content h1, 
+        .markdown-content h2, 
+        .markdown-content h3, 
+        .markdown-content h4 {
+            color: #420909;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+        .markdown-content ul, .markdown-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .markdown-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Código en modo oscuro */
+        .dark .markdown-content code {
+            background-color: rgba(246, 174, 45, 0.2);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+        }
+        .dark .markdown-content pre {
+            background-color: rgba(246, 174, 45, 0.1);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        
+        /* Código en modo claro */
+        .markdown-content code {
+            background-color: rgba(66, 9, 9, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+        }
+        .markdown-content pre {
+            background-color: rgba(66, 9, 9, 0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .markdown-content blockquote {
+            border-left: 4px solid #f6ae2d;
+            padding-left: 1rem;
+            margin-left: 0;
+            color: #777;
+            margin-bottom: 1rem;
+        }
+        
+        /* Strong text */
+        .dark .markdown-content strong {
+            font-weight: bold;
+            color: #f6ae2d;
+        }
+        .markdown-content strong {
+            font-weight: bold;
+            color: #420909;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .loading-message {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Navbar fija */
+        .navbar {
+            background-color: #2a0606;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Compensar el espacio de la navbar */
+        body {
+            padding-top: 64px;
+        }
+        
+        /* Botones de la navbar */
+        .nav-button {
+            background-color: #f6ae2d;
+            color: #420909;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .nav-button:hover {
+            background-color: #e09d1c;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(246, 174, 45, 0.3);
+        }
+        
+        /* Banner cards */
+        .feature-card {
+            transition: all 0.3s;
+        }
+        .dark .feature-card {
+            background-color: rgba(246, 174, 45, 0.1);
+            border: 1px solid rgba(246, 174, 45, 0.3);
+        }
+        .feature-card {
+            background-color: rgba(246, 174, 45, 0.1);
+            border: 1px solid rgba(66, 9, 9, 0.2);
+        }
+        .dark .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(246, 174, 45, 0.2);
+            border-color: #f6ae2d;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 9, 9, 0.1);
+            border-color: #420909;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-trueeye-dark min-h-screen transition-colors duration-300">
+    <!-- Navbar fija -->
+    <nav class="navbar">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo y título -->
+                <div class="flex items-center space-x-3">
+                    <a href="https://deeprat-trueeye-reports.hf.space" target="_blank">
+                        <img src="/static/te.png" alt="TrueEye Logo" class="h-24 w-24">
+                    </a>  
+                </div>
+                
+                <!-- Botones de navegación -->
+                <div class="flex items-center space-x-4">
+                    <a href="https://deeprat.tech" target="_blank" class="nav-button" id="my-web-btn">
+                        Mi Web
+                    </a>
+                    <a href="https://trueeye.deeprat.tech" target="_blank" class="nav-button" id="trueeye-project-btn">
+                        Proyecto TrueEye
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Banner de características -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="feature-card rounded-lg p-4">
+                <h3 class="text-trueeye-gold dark:text-trueeye-gold font-bold mb-2">Detección de Sesgos</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-200">Identificación precisa de inclinaciones positivas, negativas o neutrales</p>
+            </div>
+            <div class="feature-card rounded-lg p-4">
+                <h3 class="text-trueeye-gold dark:text-trueeye-gold font-bold mb-2">Verificación de Hechos</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-200">Detección de falacias, argumentos engañosos y desinformación</p>
+            </div>
+            <div class="feature-card rounded-lg p-4">
+                <h3 class="text-trueeye-gold dark:text-trueeye-gold font-bold mb-2">Análisis de Audiencia</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-200">Perfil demográfico y psicográfico del público objetivo</p>
+            </div>
+            <div class="feature-card rounded-lg p-4">
+                <h3 class="text-trueeye-gold dark:text-trueeye-gold font-bold mb-2">Evaluación de Intencionalidad</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-200">Análisis de manipulación y niveles de animosidad</p>
+            </div>
+        </div>
+
+        <!-- Header principal -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold text-trueeye-dark dark:text-trueeye-gold">TrueEye</h1>
+                <p class="text-lg text-gray-700 dark:text-gray-300">Sistema Inteligente de Alfabetización Mediática</p>
+            </div>
+            <button id="theme-toggle" class="p-2 rounded-full bg-trueeye-gold dark:bg-trueeye-dark text-trueeye-dark dark:text-trueeye-gold border-2 border-trueeye-dark dark:border-trueeye-gold">
+                <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+                <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </button>
+        </header>
+
+        <main>
+            <div class="bg-trueeye-gold/10 dark:bg-trueeye-gold/10 border border-trueeye-dark/20 dark:border-trueeye-gold/30 rounded-lg shadow-lg p-6 mb-8 transition-colors duration-300">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input 
+                        id="input-url" 
+                        type="url" 
+                        placeholder="Ingrese la URL a analizar..." 
+                        class="flex-grow px-4 py-3 rounded-lg border border-trueeye-dark/30 dark:border-trueeye-gold/30 focus:outline-none focus:ring-2 focus:ring-trueeye-gold dark:focus:ring-trueeye-gold bg-white dark:bg-trueeye-dark/50 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    >
+                    <button 
+                        id="analyze-btn" 
+                        class="px-6 py-3 bg-trueeye-gold hover:bg-trueeye-gold/90 text-trueeye-dark font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                        Analizar
+                    </button>
+                </div>
+                <div id="error-message" class="mt-2 text-red-600 dark:text-red-400 hidden"></div>
+            </div>
+
+            <div id="loading" class="hidden">
+                <div class="bg-trueeye-gold/10 dark:bg-trueeye-gold/10 border border-trueeye-dark/20 dark:border-trueeye-gold/30 rounded-lg shadow-lg p-8 text-center">
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-trueeye-gold"></div>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-200 loading-message">Analizando contenido...</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Esto puede tomar algunos minutos mientras realizamos un análisis exhaustivo</p>
+                    <div id="progress-timer" class="text-xs text-gray-500 dark:text-gray-500 mt-4">Tiempo transcurrido: 0:00</div>
+                </div>
+            </div>
+
+            <div id="result-container" class="hidden bg-trueeye-gold/10 dark:bg-trueeye-gold/10 border border-trueeye-dark/20 dark:border-trueeye-gold/30 rounded-lg shadow-lg p-6 transition-colors duration-300">
+                <h2 class="text-2xl font-semibold text-trueeye-dark dark:text-trueeye-gold mb-4">Resultado del Análisis</h2>
+                <div id="result" class="markdown-content text-gray-800 dark:text-gray-200"></div>
+            </div>
+
+            <div id="info-box" class="mt-8 bg-trueeye-gold/20 dark:bg-trueeye-gold/10 border border-trueeye-dark/20 dark:border-trueeye-gold/30 rounded-lg p-4">
+                <h3 class="text-lg font-semibold text-trueeye-dark dark:text-trueeye-gold mb-2">¿Cómo funciona?</h3>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">
+                    TrueEye analiza artículos de noticias y contenido web para detectar sesgos, identificar audiencias objetivo 
+                    y revelar agendas ocultas. Simplemente pegue una URL y deje que nuestro sistema impulsado por IA le proporcione 
+                    un informe completo de alfabetización mediática.
+                </p>
+            </div>
+        </main>
+
+        <footer class="mt-12 text-center text-gray-600 dark:text-gray-400">
+            <p>Powered by <a href="https://anthropic.com" target="_blank">Claude (Anthropic)</a> • 
+                Desarrollado para promover la alfabetización mediática y el pensamiento crítico</p>
+        </footer>
+    </div>
+
+    <script>
+        // Variables globales
+        let analysisStartTime = null;
+        let timerInterval = null;
+        // Configurar URLs de los botones (cambiar estas URLs según necesites)
+        document.getElementById('my-web-btn').href = 'https://deeprat.tech'; // Cambia esto a tu URL
+        document.getElementById('trueeye-project-btn').href = 'https://trueeye.deeprat.tech'; // Cambia esto a la URL del proyecto
+        // Cambio de tema
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeIconLight.classList.remove('hidden');
+            themeIconDark.classList.add('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeIconLight.classList.add('hidden');
+            themeIconDark.classList.remove('hidden');
+        }
+        themeToggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+                themeIconLight.classList.add('hidden');
+                themeIconDark.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+                themeIconLight.classList.remove('hidden');
+                themeIconDark.classList.add('hidden');
+            }
+        });
+        // Funcionalidad de análisis
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const inputUrl = document.getElementById('input-url');
+        const resultContainer = document.getElementById('result-container');
+        const resultDiv = document.getElementById('result');
+        const loadingDiv = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+        const progressTimer = document.getElementById('progress-timer');
+        analyzeBtn.addEventListener('click', async () => {
+            const url = inputUrl.value.trim();
+            
+            if (!url) {
+                showError('Por favor ingrese una URL');
+                return;
+            }
+            
+            if (!isValidUrl(url)) {
+                showError('Por favor ingrese una URL válida (incluya http:// o https://)');
+                return;
+            }
+            
+            clearError();
+            startAnalysis();
+            
+            try {
+                const response = await fetch(window.location.origin + '/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`El servidor retornó ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success && data.error) {
+                    // Manejar tipos de error específicos
+                    if (data.error === 'timeout') {
+                        showError('El análisis tardó demasiado tiempo. Por favor intente nuevamente con un artículo más simple o intente más tarde.');
+                    } else if (data.error === 'connection') {
+                        showError('No se pudo conectar con el servicio de análisis. Por favor verifique su conexión e intente nuevamente.');
+                    } else {
+                        showError(data.result || 'Ocurrió un error durante el análisis.');
+                    }
+                    stopAnalysis();
+                    return;
+                }
+                
+                // Mostrar resultados
+                resultDiv.innerHTML = marked.parse(data.result);
+                resultContainer.classList.remove('hidden');
+                stopAnalysis();
+                
+                // Hacer scroll a los resultados
+                resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+            } catch (error) {
+                showError('Error al analizar la URL. Por favor intente más tarde.');
+                console.error('Error:', error);
+                stopAnalysis();
+            }
+        });
+        function startAnalysis() {
+            loadingDiv.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            analyzeBtn.disabled = true;
+            analysisStartTime = Date.now();
+            
+            // Actualizar timer cada segundo
+            timerInterval = setInterval(() => {
+                const elapsed = Date.now() - analysisStartTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                progressTimer.textContent = `Tiempo transcurrido: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        function stopAnalysis() {
+            loadingDiv.classList.add('hidden');
+            analyzeBtn.disabled = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+        function clearError() {
+            errorMessage.textContent = '';
+            errorMessage.classList.add('hidden');
+        }
+        // Permitir presionar Enter en el campo de entrada
+        inputUrl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !analyzeBtn.disabled) {
+                analyzeBtn.click();
+            }
+        });
+        // URLs de ejemplo para pruebas
+        const exampleUrls = [
+            'https://example.com/news-article',
+            'https://bbc.com/news/article-123',
+            'https://cnn.com/2025/01/article'
+        ];
+        
+        // Agregar URL de ejemplo con doble clic (para pruebas)
+        inputUrl.addEventListener('dblclick', () => {
+            inputUrl.value = exampleUrls[Math.floor(Math.random() * exampleUrls.length)];
+        });
+    </script>
+</body>
+</html>
