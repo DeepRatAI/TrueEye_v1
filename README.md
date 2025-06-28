@@ -1,14 +1,3 @@
----
-title: TrueEye Reports
-emoji: 🧿
-colorFrom: purple
-colorTo: purple
-sdk: docker
-pinned: false
-license: mit
-thumbnail: >-
-  https://cdn-uploads.huggingface.co/production/uploads/683866c9aa7db732a49d525d/a1tcXbQwNIxmPOaXWdHwQ.png
----
 # 🧿 TrueEye — Intelligent Media Literacy System
 
 **TrueEye** es una herramienta de inteligencia artificial diseñada para analizar artículos de noticias y contenido web, con el objetivo de detectar **sesgos narrativos**, identificar la **audiencia objetivo**, y revelar **intencionalidades ocultas** o estructuras de manipulación simbólica.
