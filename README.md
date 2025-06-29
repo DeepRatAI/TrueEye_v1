@@ -1,13 +1,12 @@
-<p align="center">
-  <img src="static/banner.gif" alt="Banner TrueEye" width="100%">
-</p>
-
 ---
 license: creativeml-openrail-m
 title: TrueEye Reports
 sdk: docker
 ---
 
+<p align="center">
+  <img src="static/banner.gif" alt="Banner TrueEye" width="100%">
+</p>
 # 🧿 TrueEye — Intelligent Media Literacy System
 
 **TrueEye** is an AI-powered tool designed to analyze news articles and web content to detect narrative bias, identify the target audience, and reveal hidden intentions or manipulative rhetorical structures.
