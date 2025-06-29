@@ -2,9 +2,6 @@
 license: creativeml-openrail-m
 title: TrueEye Reports
 sdk: docker
-emoji: 👁
-colorFrom: yellow
-colorTo: purple
 ---
 <p align="center">
   <img src="static/banner.gif" alt="Banner TrueEye" width="100%">
